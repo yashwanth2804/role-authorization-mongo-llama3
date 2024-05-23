@@ -17,6 +17,7 @@ export class RoleAuthMongo {
     this.roleService = new RoleService();
     this.userService = new UserService();
     this.accessControlResourcePathService = new AccessControlResourcePathService();
+    this.isAuthorized = this.isAuthorized.bind(this);
     connectDB(options.db);
   }
 
