@@ -1,5 +1,5 @@
 {
-  "name": "role-auth-mongo-llama3-code",
+  "name": "role-authorization-mongo-llama3",
   "version": "1.0.0",
   "description": "Role-based authorization library for Node.js using MongoDB genrated by llama3",
   "main": "dist/index.js",
@@ -9,6 +9,11 @@
   },
   "keywords": [],
   "author": "yaswanthkambala",
+  "homepage": "https://github.com/yashwanth2804/role-authorization-mongo-llama3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yashwanth2804/role-authorization-mongo-llama3"
+  },
   "license": "MIT",
   "dependencies": {
     "mongoose": "^5.13.22"
