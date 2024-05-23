@@ -40,6 +40,41 @@ const accessControlList = {
 };
 ```
 
+> note: this list can also live in the mongodb
+
+#### Acl in mongodb
+```javascript
+
+const mongoose = require('mongoose');
+const aclModel = mongoose.model('Acl', {
+  path: String,
+  roles: [{ type: String }]
+});
+
+async function isAuthorized(req, res, next) {
+  const userId = req.headers['x-user-id'];
+  const user = await userService.getUser(userId);
+  if (!user) {
+    return res.status(404).json({ error: `User ${userId} does not exist` });
+  }
+
+  const path = req.path;
+  const acl = await aclModel.findOne({ path });
+  if (!acl) {
+    return res.status(403).json({ error: `Access control list not defined for path ${path}` });
+  }
+
+  const userRoles = user.roles;
+  const hasAccess = acl.roles.some(role => userRoles.includes(role));
+  if (!hasAccess) {
+    return res.status(403).json({ error: `User ${userId} does not have access to ${path}` });
+  }
+
+  next();
+}
+
+```
+
 Next, create middleware to check if a role exists and if a user is authorized:
 
 ```javascript
