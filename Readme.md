@@ -28,65 +28,7 @@ const roleAuthMongo = new RoleAuthMongo({
 const roleService = roleAuthMongo.getRoleService();
 const userService = roleAuthMongo.getUserService();
 ```
-
-Then, define your access control list:
-
-```javascript
-const accessControlList = {
-  "/protected-resource": ["admin"],
-  "/user-protected-resource": ["admin", "user"],
-  "/guest-resource": ["admin", "user", "guest"],
-  "/editor-resource": ["admin", "editor"],
-};
-```
-
-> note: this list can also live in the mongodb
-
-#### Acl in mongodb
-```javascript
-
-const mongoose = require('mongoose');
-const aclModel = mongoose.model('Acl', {
-  path: String,
-  roles: [{ type: String }]
-});
-
-async function isAuthorized(req, res, next) {
-  const userId = req.headers['x-user-id'];
-  const user = await userService.getUser(userId);
-  if (!user) {
-    return res.status(404).json({ error: `User ${userId} does not exist` });
-  }
-
-  const path = req.path;
-  const acl = await aclModel.findOne({ path });
-  if (!acl) {
-    return res.status(403).json({ error: `Access control list not defined for path ${path}` });
-  }
-
-  const userRoles = user.roles;
-  const hasAccess = acl.roles.some(role => userRoles.includes(role));
-  if (!hasAccess) {
-    return res.status(403).json({ error: `User ${userId} does not have access to ${path}` });
-  }
-
-  next();
-}
-
-```
-
-Next, create middleware to check if a role exists and if a user is authorized:
-
-```javascript
-async function roleExists(req, res, next) {
-  // Implementation here
-}
-
-async function isAuthorized(req, res, next) {
-  // Implementation here
-}
-```
-
+ 
 Finally, define your API endpoints:
 
 ```javascript
@@ -110,22 +52,18 @@ app.post("/roles", async (req, res) => {
   }
 });
 
-app.get("/protected-resource", isAuthorized, async (req, res) => {
+app.get("/protected-resource", roleAuthMongo.isAuthorized, async (req, res) => {
   res.status(200).json({ message: "Authorized to access protected resource" });
 });
 
-app.get("/user-protected-resource", isAuthorized, async (req, res) => {
+app.get("/user-protected-resource", roleAuthMongo.isAuthorized, async (req, res) => {
   res.status(200).json({ message: "Authorized to access user protected resource" });
 });
 
-app.get("/editor-resource", isAuthorized, async (req, res) => {
+app.get("/editor-resource", roleAuthMongo.isAuthorized, async (req, res) => {
   res.status(200).json({ message: "Authorized to access editor resource" });
 });
-
-app.get("/roles/:roleName", roleExists, async (req, res) => {
-  res.status(200).json({ message: `Role ${req.params.roleName} exists` });
-});
-
+ 
 app.listen(3000, () => {
   console.log("Server listening on port 3000");
 });
