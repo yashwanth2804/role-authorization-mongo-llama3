@@ -1,6 +1,6 @@
 {
   "name": "role-authorization-mongo-llama3",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Role-based authorization library for Node.js using MongoDB genrated by llama3",
   "main": "dist/index.js",
   "scripts": {
